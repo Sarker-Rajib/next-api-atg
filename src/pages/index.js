@@ -1,11 +1,23 @@
 import Head from 'next/head'
+import { Col, Container, Row } from 'react-bootstrap'
+import { useState } from 'react'
+import UsersCard from '@/Components/UsersCard/UsersCard'
 import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
 
-const inter = Inter({ subsets: ['latin'] })
+export default function Home(props) {
+  const [loading, setLoading] = useState(true)
+  const allUsers = props.data;
+  const [userDetails, setUserDetails] = useState();
+  const [index, setIndex] = useState();
+  const active = {
+    index,
+    setIndex
+  }
 
-export default function Home() {
+  const myLoader = () => {
+    return `${userDetails?.avatar}`;
+  }
+
   return (
     <>
       <Head>
@@ -14,110 +26,87 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>src/pages/index.js</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
-        </div>
+      <main >
+        <div>
+          <Container>
+            <Row className='py-1 py-lg-5 g-1 g-lg-4'>
+              <Col lg={6} className='order-2 order-lg-1'>
+                <div className='border rounded p-3 pb-4 shadow-colored'>
+                  <h2 className='text-center heading'>User List</h2>
+                  <div
+                    style={{ maxHeight: '78vh', overflowY: 'scroll' }}
+                    className='p-3'>
 
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
-          </div>
-        </div>
+                    {/* {
+                      loading === true && <Loader />
+                    }
+*/}
+                    {
+                      allUsers?.length === 0 && <p>No data found</p>
+                    }
 
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
+                    {
+                      allUsers?.sort((a, b) => {
+                        if (a.profile.firstName < b.profile.firstName) {
+                          return -1;
+                        }
+                        else return 1;
+                      }).map((user, i) => <UsersCard key={i} i={i} active={active} user={user} setUserDetails={setUserDetails} />)
+                    }
 
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
+                  </div>
+                </div>
+              </Col>
+              <Col lg={6} className='order-1 order-lg-2'>
+                <div className='border rounded shadow-colored p-3 h-100'>
+                  <h2 className='text-center heading'>User Details</h2>
 
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
+                  <div className="text-center py-0 py-lg-3">
+                    <div className='image-wrapper'>
+                      <Image loader={myLoader} src={`${userDetails?.avatar}`} width={50}
+                        height={50} alt="po" className="rounded-circle" />
+                    </div>
+                  </div>
+                  {
+                    userDetails?.profile?.username ?
+                      <p className='pt-2 text-center'>@{userDetails?.profile?.username}</p>
+                      :
+                      <p className='pt-2 text-center'>username</p>
+                  }
+                  <div className="mb-1 mb-lg-3">
+                    <textarea defaultValue={userDetails?.Bio} className='form-control' disabled></textarea>
+                  </div>
+                  <div className="mb-1 mb-lg-3">
+                    <label htmlFor="">Full Name</label>
 
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
+                    <input type="text" defaultValue={userDetails ? `${userDetails?.profile?.firstName} ${userDetails?.profile?.lastName}` : ''} className='form-control' disabled />
+
+                  </div>
+                  <div className="mb-1 mb-lg-3">
+                    <label htmlFor="">Job Title</label>
+                    <input type="text" defaultValue={userDetails?.jobTitle} className='form-control' disabled />
+                  </div>
+                  <div className="mb-1 mb-lg-3">
+                    <label htmlFor="">Email</label>
+                    <input type="text" defaultValue={userDetails?.profile?.email} className='form-control' disabled />
+                  </div>
+                </div>
+              </Col>
+            </Row>
+          </Container>
+        </div >
       </main>
     </>
   )
+}
+
+export async function getServerSideProps() {
+  const res = await fetch('https://602e7c2c4410730017c50b9d.mockapi.io/users');
+  const data = await res.json();
+
+  return {
+    props: {
+      data,
+    },
+  }
 }
